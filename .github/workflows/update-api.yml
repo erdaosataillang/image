@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'images/**'
+  workflow_dispatch: # 手動でActionを実行できるように追加
 
 permissions:
   contents: write
@@ -18,9 +19,8 @@ jobs:
       - name: Generate JSON
         run: |
           mkdir -p api
-          # あなたのリポジトリURLを設定しています
-          echo '{"baseUrl": "https://erdaosataillang.github.io/image/images/", "images": [' > api/images.json
-          # imagesフォルダ内の画像をリストアップしてJSONに追記
+          # ここを独自ドメインのURLに書き換えました！
+          echo '{"baseUrl": "https://file.sorairosystem.com/images/", "images": [' > api/images.json
           ls -1 images | grep -E '\.(jpg|jpeg|png|HEIC|heic|JPG|PNG)$' | sed 's/.*/"&",/' | sed '$ s/,$//' >> api/images.json
           echo ']}' >> api/images.json
 
@@ -29,5 +29,5 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add api/images.json
-          git commit -m "Auto-update images.json" || echo "No changes to commit"
+          git commit -m "Auto-update images.json with custom domain" || echo "No changes to commit"
           git push
