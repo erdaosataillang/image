@@ -1,0 +1,33 @@
+name: Generate Image API JSON
+
+on:
+  push:
+    paths:
+      - 'images/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate JSON
+        run: |
+          mkdir -p api
+          # あなたのリポジトリURLを設定しています
+          echo '{"baseUrl": "https://erdaosataillang.github.io/image/images/", "images": [' > api/images.json
+          # imagesフォルダ内の画像をリストアップしてJSONに追記
+          ls -1 images | grep -E '\.(jpg|jpeg|png|HEIC|heic|JPG|PNG)$' | sed 's/.*/"&",/' | sed '$ s/,$//' >> api/images.json
+          echo ']}' >> api/images.json
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add api/images.json
+          git commit -m "Auto-update images.json" || echo "No changes to commit"
+          git push
